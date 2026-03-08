@@ -1,0 +1,64 @@
+{% extends "security_base.html" %}
+
+{% block title %}Breach Monitor{% endblock %}
+{% block header_title %}Breach Monitor{% endblock %}
+{% block header_desc %}Vigilancia activa de filtraciones masivas de datos en la Dark Web.{% endblock %}
+
+{% block analysis_content %}
+Utilizamos la tecnología de **Have I Been Pwned** a través de un modelo de **k-anonymity**. Esto significa que nunca
+enviamos tu contraseña real a internet. Solo enviamos los primeros 5 caracteres del hash SHA-1 para descargar una lista
+de posibles coincidencias y compararlas localmente en tu navegador.
+{% endblock %}
+
+{% block tech_specs %}
+• **Fuente**: HIBP Range API v3.<br>
+• **Privacidad**: Zero-Knowledge SHA-1 Prefix.<br>
+• **Frecuencia**: Análisis en tiempo real.
+{% endblock %}
+
+{% block status_visual %}
+<div class="h2 fw-bold mb-0 {% if audit.insecure > 0 %}text-danger{% else %}text-success{% endif %}">
+    {{ audit.insecure if audit.insecure > 0 else "0" }}
+</div>
+<div class="text-dim small mb-3">Alertas Activas</div>
+<div class="risk-bar-container">
+    <div class="risk-bar {% if audit.insecure > 0 %}risk-red{% else %}risk-green{% endif %}"
+        style="width: {{ 100 if audit.insecure > 0 else 0 }}%"></div>
+</div>
+<span class="badge-status {% if audit.insecure > 0 %}bg-danger{% else %}bg-success{% endif %}">
+    {% if audit.insecure > 0 %}EXPUESTO{% else %}SEGURO{% endif %}
+</span>
+{% endblock %}
+
+{% block results_content %}
+<div class="p-3 border border-white-5 rounded-4 mb-4" style="background: rgba(239, 68, 68, 0.05);">
+    <h6 class="text-white mb-2"><i class="fas fa-microchip me-2"></i> ¿Cómo funciona el filtrado?</h6>
+    <p class="small text-dim mb-0">Cuando una empresa sufre un hackeo, las bases de datos de contraseñas se venden en la
+        Dark Web. Nuestro monitor compara tus credenciales con más de **12 mil millones** de registros filtrados sin
+        comprometer tu privacidad.</p>
+</div>
+
+{% if audit.insecure_list %}
+<h6 class="text-danger fw-bold mb-3">Servicios Comprometidos:</h6>
+<div class="row g-3">
+    {% for item in audit.insecure_list %}
+    <div class="col-sm-6">
+        <div class="glass-card p-3 mb-0" style="background: rgba(239, 68, 68, 0.1);">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-bold">{{ item.service }}</div>
+                    <div class="small text-dim">{{ item.username }}</div>
+                </div>
+                <i class="fas fa-exclamation-triangle text-danger"></i>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-check-circle text-success display-4 mb-3"></i>
+    <p class="text-dim">No se han encontrado tus contraseñas en ninguna filtración conocida.</p>
+</div>
+{% endif %}
+{% endblock %}

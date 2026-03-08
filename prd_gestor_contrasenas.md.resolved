@@ -1,0 +1,126 @@
+# Documento de Requisitos del Producto (PRD)
+**Proyecto 001: Gestor de Contraseñas**
+
+---
+
+## 1. Resumen Ejecutivo
+**Propósito:** El proyecto "Gestor de Contraseñas" es una aplicación web diseñada para almacenar, organizar y proteger las credenciales y datos de acceso de los usuarios de forma segura. Combina una arquitectura robusta de 3 capas con una moderna interfaz de usuario (Single Page Application - SPA) que garantiza una experiencia fluida, rápida y altamente segura.
+
+## 2. Visión y Objetivos
+- **Objetivo Principal:** Proveer a los usuarios una herramienta confiable y fácil de usar para evitar el uso de contraseñas débiles o repetidas.
+- **Objetivos Específicos:**
+  - Facilitar el acceso y la gestión de contraseñas mediante un "Dashboard Avanzado".
+  - Proporcionar herramientas de generación de contraseñas seguras.
+  - Asegurar la navegación e interfaces limpias mediante diseños de colores suaves y soporte para un rendimiento de alta velocidad (SPA).
+- **Descripción para GitHub:** Gestor de Contraseñas es una SPA avanzada y robusta con arquitectura de tres capas (Front, Middle, Back) para proteger y organizar credenciales. Incluye un dashboard intuitivo, generador de contraseñas fuertes, búsqueda optimizada y alertas de seguridad. Garantiza la privacidad absoluta, alto rendimiento y una experiencia de usuario premium total.
+
+## 3. Alcance y Funcionalidades Clave (Features)
+
+### 3.1. Autenticación y Seguridad Base
+- Inicio de sesión y registro seguro.
+- Uso de contraseña maestra para bloquear/desbloquear la bóveda.
+- Páginas de seguridad y auditoría (alertas de contraseñas repetidas o filtradas).
+
+### 3.2. Gestión de Credenciales
+- **Cuentas y Servicios:** Posibilidad de asociar credenciales (usuario/contraseña) a distintas cuentas y servicios.
+- **Búsqueda Avanzada:** Barra de búsqueda optimizada para encontrar rápidamente un servicio de una cuenta específica.
+- Acciones CRUD integradas de forma fluida para credenciales.
+
+### 3.3. Herramientas Especiales
+- **Generador de Contraseñas:** Permite ajustar la longitud y los caracteres deseados para crear contraseñas fuertes de inmediato.
+- **Módulo "Brute Force":** Sección especializada en medir la seguridad de accesos y revisar navegación entre cuentas y servicios vinculados.
+
+### 3.4. Interfaz de Usuario (UI/UX)
+- Arquitectura SPA (Single Page Application) para que la página no tenga que recargar al navegar.
+- Experiencia y diseño "Premium" que incluye rediseño compacto adaptado a las necesidades de los usuarios.
+
+## 4. Requisitos No Funcionales (Técnicos)
+- **Arquitectura:** Diseño en 3 capas (Front-end, Middle, Back-end) para mantener separación de responsabilidades.
+  
+  ```mermaid
+  graph TD
+      subgraph Frontend ["Capa de Presentación (Front)"]
+          UI["Interfaz de Usuario SPA"]
+          JS["Lógica en Cliente JS"]
+          Plantillas["Plantillas HTML/CSS"]
+      end
+
+      subgraph MiddleLayer ["Capa de Negocio (Middle)"]
+          Views["Controladores / app.py"]
+          Servicios["Lógica de Servicios"]
+          Auth["Autenticación y Seguridad"]
+      end
+
+      subgraph Backend ["Capa de Datos (Back)"]
+          Storage["Gestión de Almacenamiento / storage.py"]
+          Utils["Utilidades Criptográficas"]
+          DB[("Base de Datos Cifrada")]
+      end
+
+      UI -->|"Peticiones HTTP/Fetch"| Views
+      JS -->|"API REST"| Views
+      Views --> Servicios
+      Servicios --> Auth
+      Servicios --> Storage
+      Storage --> DB
+      Storage --> Utils
+  ```
+
+- **Seguridad:** Cifrado en reposo para todas las contraseñas. Implementación segura de las variables de entorno.
+- **Rendimiento:** Tiempos de carga mínimos en la web.
+
+---
+
+## 5. Capturas de Pantalla y Evidencia Web
+> **Nota:** Esta sección está destinada a documentar visualmente el funcionamiento en producción / desarrollo. Reemplaza el texto indicativo con las imágenes correspondientes.
+
+### 5.1. Pantalla de Autenticación (Login / Registro)
+*Descripción: Evidencia del inicio de sesión seguro en el sistema.*
+> *[Inserta aquí tu captura de la pantalla de Login]*
+
+### 5.2. Dashboard Avanzado
+*Descripción: Vista principal tras iniciar sesión donde se muestra el resumen de seguridad y cuentas recientes.*
+> *[Inserta aquí tu captura del Dashboard Principal]*
+
+### 5.3. Gestión de Cuentas y Servicios
+*Descripción: Interfaz donde se listan y administran las credenciales por cuenta/servicio.*
+> *[Inserta aquí tu captura de la vista de Servicios/Cuentas]*
+
+### 5.4. Generador de Contraseñas
+*Descripción: Interfaz interactiva de la herramienta de creación de contraseñas seguras.*
+> *[Inserta aquí tu captura del Generador]*
+
+### 5.5. Barra de Búsqueda y Navegación
+*Descripción: Demostración de la búsqueda optimizada y el acceso a los detalles del servicio.*
+> *[Inserta aquí tu captura de la sección de Búsqueda / Módulo Brute Force]*
+
+### 5.6. Configuración del Perfil
+*Descripción: Área donde el usuario gestiona sus preferencias y ajustes de seguridad.*
+> *[Inserta aquí tu captura de la Configuración de Perfil]*
+
+### 5.7. Alertas de Seguridad
+*Descripción: Notificaciones visuales sobre contraseñas vulneradas, débiles o repetidas.*
+> *[Inserta aquí tu captura de las Alertas o Auditoría de Contraseñas]*
+
+### 5.8. Vista Móvil / Responsive
+*Descripción: Adaptación del diseño a dispositivos móviles o resoluciones reducidas.*
+> *[Inserta aquí tu captura de la versión Web Móvil]*
+
+---
+
+## 6. Criterios de Aceptación
+1. El usuario debe poder iniciar sesión y ver su "Dashboard Avanzado" en menos de 2 segundos.
+2. Todas las contraseñas deben estar encriptadas antes de tocar la capa *Back*.
+3. El buscador de servicios debe encontrar resultados relevantes mientras se teclea sin redirigir indiscriminadamente a cuentas completas.
+4. El cambio de pantallas (UI SPA) debe mantenerse fluido y aplicar el rediseño premium de manera consistente.
+
+---
+
+## 7. Futuras Mejoras (Roadmap)
+- **Autenticación Multifactor (MFA/2FA):** Implementación de verificación en dos pasos (App Authenticator o correo) para máxima seguridad.
+- **Soporte Biométrico (WebAuthn):** Iniciar sesión con huella digital o reconocimiento facial usando estándares modernos.
+- **Exportación e Importación:** Herramienta segura para migrar contraseñas desde otros gestores (soportando importación/exportación cifrada).
+- **Registro de Auditoría (Historial):** Log detallado para que el usuario pueda ver desde dónde y cuándo se accedió a su bóveda.
+- **Aplicación Móvil Nativa (iOS/Android):** Desarrollo de aplicaciones dedicadas que se comuniquen con la API actual de Python/Flask.
+- **Integración con Bot de Telegram:** Recibir notificaciones de seguridad, alertas de acceso o consultar credenciales protegidas rápidamente a través de Telegram.
+- **Servicio VPN Integrado:** Incorporar u ofrecer enrutamiento seguro (VPN) dentro del gestor de contraseñas para proteger las conexiones y la navegación del usuario.

@@ -1,0 +1,1 @@
+# Documentation - Arquitectura, guías, decisiones

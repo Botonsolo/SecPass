@@ -1,0 +1,85 @@
+{% extends "security_base.html" %}
+
+{% block title %}Auditoría de Seguridad{% endblock %}
+{% block header_title %}Auditoría de Seguridad{% endblock %}
+{% block header_desc %}Análisis exhaustivo de la robustez de tus contraseñas y cumplimiento de normas.{% endblock %}
+
+{% block analysis_content %}
+El sistema analiza cada una de tus contraseñas basándose en los **SANS Institute Standards**. Evaluamos no solo la
+longitud, sino la entropía (diversidad de caracteres) y patrones comunes. Una puntuación alta asegura que tus datos son
+resistentes a ataques de fuerza bruta y ataques de diccionario.
+{% endblock %}
+
+{% block tech_specs %}
+• **Algoritmo**: Validación de entropía Shannon.<br>
+• **Scoring**: 0-100 (Logarítmico).<br>
+• **Estándar**: NIST Digital Identity Guidelines.
+{% endblock %}
+
+{% block status_visual %}
+<div
+    class="h2 fw-bold mb-0 {% if audit.secure == audit.total %}text-success{% elif audit.insecure > audit.total * 0.3 %}text-danger{% else %}text-warning{% endif %}">
+    {{ "%.0f"|format((audit.secure / audit.total * 100) if audit.total > 0 else 100) }}%
+</div>
+<div class="text-dim small mb-3">Salud de la Bóveda</div>
+<div class="risk-bar-container">
+    <div class="risk-bar {% if audit.secure == audit.total %}risk-green{% elif audit.insecure > audit.total * 0.3 %}risk-red{% else %}risk-orange{% endif %}"
+        style="width: {{ (audit.secure / audit.total * 100) if audit.total > 0 else 100 }}%"></div>
+</div>
+<span
+    class="badge-status {% if audit.secure == audit.total %}bg-success{% elif audit.insecure > audit.total * 0.3 %}bg-danger{% else %}bg-warning{% endif %}">
+    {{ audit.level|upper }}
+</span>
+{% endblock %}
+
+{% block results_content %}
+<div class="table-responsive">
+    <table class="table table-dark table-hover border-0">
+        <thead>
+            <tr class="text-dim" style="font-size: 0.8rem;">
+                <th>CRITERIO</th>
+                <th>CUMPLIMIENTO</th>
+                <th>ESTADO</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Longitud (>12 carac.)</td>
+                <td>{{ audit.criteria.has_12_plus }} / {{ audit.total }}</td>
+                <td><i
+                        class="fas {% if audit.criteria.has_12_plus == audit.total %}fa-check text-success{% else %}fa-warning text-warning{% endif %}"></i>
+                </td>
+            </tr>
+            <tr>
+                <td>Uso de Símbolos</td>
+                <td>{{ audit.criteria.has_symbols }} / {{ audit.total }}</td>
+                <td><i
+                        class="fas {% if audit.criteria.has_symbols == audit.total %}fa-check text-success{% else %}fa-warning text-warning{% endif %}"></i>
+                </td>
+            </tr>
+            <tr>
+                <td>Números y Mayúsculas</td>
+                <td>{{ audit.criteria.has_digits }} / {{ audit.total }}</td>
+                <td><i
+                        class="fas {% if audit.criteria.has_digits == audit.total %}fa-check text-success{% else %}fa-warning text-warning{% endif %}"></i>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% if audit.insecure_list %}
+<div class="mt-4">
+    <h6 class="text-danger fw-bold"><i class="fas fa-triangle-exclamation me-2"></i> Contraseñas a Rotar:</h6>
+    <div class="list-group list-group-flush bg-transparent">
+        {% for item in audit.insecure_list %}
+        <div
+            class="list-group-item bg-transparent border-white-5 text-dim d-flex justify-content-between align-items-center">
+            <span>{{ item.service }} ({{ item.username }})</span>
+            <span class="badge bg-danger rounded-pill" style="font-size: 0.6rem;">BAJA SEGURIDAD</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

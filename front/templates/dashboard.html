@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecPass v3.1 - Advanced Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --sidebar-width: 280px;
+
+            /* UI Colors */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Navbar Glass */
+        .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 12px 24px;
+        }
+
+        /* Sidebar Glassmorphism */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px 24px;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-search {
+            padding: 0 20px 20px;
+        }
+
+        .sidebar-search input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 12px;
+            padding: 10px 16px;
+            width: 100%;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar-search input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Domain & Accounts */
+        .email-domain-header {
+            padding: 10px 24px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .email-domain-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .email-account {
+            padding: 8px 24px 8px 48px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            transition: 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .email-account:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .email-account.selected {
+            background: rgba(99, 102, 241, 0.1);
+            color: white;
+            border-left: 3px solid var(--primary);
+            font-weight: 600;
+        }
+
+        .email-account {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-actions {
+            display: none;
+            gap: 8px;
+            margin-right: 12px;
+        }
+
+        .email-account:hover .account-actions {
+            display: flex;
+        }
+
+        .account-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            padding: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            line-height: 1;
+        }
+
+        .account-action-btn:hover {
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .account-action-btn.delete:hover {
+            color: var(--danger);
+        }
+
+        /* Fixed Sidebar Menus */
+        .email-accounts {
+            display: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .email-accounts.show {
+            display: block;
+        }
+
+        .email-domain-header .fa-chevron-down {
+            transition: transform 0.3s ease;
+        }
+
+
+        /* Main Content area */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+            background: transparent;
+        }
+
+        /* V3 Summary Header */
+        .summary-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        .summary-item {
+            text-align: left;
+            padding: 0 32px;
+            border-right: 1px solid var(--glass-border);
+        }
+
+        .summary-item:last-child {
+            border-right: none;
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .summary-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* V3 Module Grid Cards */
+        .module-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 32px;
+            height: 100%;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .module-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .module-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+        }
+
+        .module-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .module-desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .progress-micro {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .progress-micro-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Account Details */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .service-search-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .service-search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            opacity: 0.5;
+            pointer-events: none;
+            font-size: 0.9rem;
+        }
+
+        .service-search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: white !important;
+            border-radius: 12px !important;
+            padding: 10px 16px 10px 44px !important;
+            font-size: 0.88rem !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .service-search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .credential-row {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .credential-row:hover {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: scale(1.005);
+        }
+
+        /* Medidor de fuerza vertical */
+        .strength-meter-v {
+            width: 4px;
+            height: 40px;
+            border-radius: 10px;
+            margin-right: 16px;
+        }
+
+        /* Modals Dark */
+        .modal-content {
+            background: #0f172a;
+            color: white;
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--glass-border);
+            padding: 24px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--glass-border);
+            padding: 20px 24px;
+        }
+
+        .form-control,
+        .form-select {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 12px;
+            padding: 12px 16px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: none;
+        }
+
+        /* Utils */
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .text-dim {
+            color: var(--text-dim);
+        }
+
+        .border-white-5 {
+            border-color: var(--glass-border) !important;
+        }
+
+        .hibp-warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 12px;
+            display: none;
+            font-size: 0.85rem;
+        }
+
+        .hibp-safe {
+            color: #86efac;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .hover-text-white:hover {
+            color: white !important;
+            transform: scale(1.1);
+            transition: all 0.2s ease;
+        }
+
+        .premium-profile-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-dim) !important;
+            transition: all 0.3s ease;
+        }
+
+        .premium-profile-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+            color: white !important;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand mb-0 h1 d-flex align-items-center" href="/dashboard">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="SecPass Logo"
+                    style="height: 32px; margin-right: 12px;">
+                SecPass <span class="badge bg-primary-light text-primary ms-2" style="font-size: 0.6em;">v3.1 PRO</span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-dim me-2 d-none d-md-inline" style="font-size: 0.85em;">Premium Security Active</span>
+                <button onclick="showProfileModal()" class="btn premium-profile-btn p-2" title="Perfil de Usuario">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </button>
+                <div class="vr mx-2 opacity-10" style="height: 20px; align-self: center;"></div>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="fas fa-sign-out-alt me-1"></i> Salir
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="content-wrapper">
+            <!-- SIDEBAR -->
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <i class="fas fa-user-circle me-2 text-primary" style="opacity: 0.8;"></i> Mis Cuentas
+                    <button class="btn btn-sm btn-close d-md-none" onclick="toggleSidebar()"></button>
+                </div>
+
+                <div class="sidebar-search">
+                    <input type="text" id="searchSidebar" placeholder="Buscar..." onkeyup="filterSidebar()">
+                </div>
+
+                <div style="padding: 10px 15px;">
+                    <button class="btn btn-primary w-100 btn-sm" onclick="showNewAccountModal()">
+                        ➕ Nueva Cuenta
+                    </button>
+                </div>
+
+                <div id="sidebar-content"></div>
+            </div>
+
+
+            <!-- MAIN CONTENT -->
+            <div class="main-content" id="mainContent">
+                <!-- Dashboard Overview (se oculta al ver una cuenta) -->
+                <div id="dashboard-overview">
+                    <!-- V3 Summary Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 mb-0 fw-bold text-white">Resumen de Seguridad</h2>
+                    </div>
+                    <div class="summary-header">
+                        <div class="summary-item">
+                            <span class="summary-label">Total Servicios</span>
+                            <span class="summary-value">{{ total_services }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Contraseñas</span>
+                            <span class="summary-value">{{ total_credentials }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Estado Global</span>
+                            <span class="summary-value">
+                                <span class="badge bg-success" id="global-security-badge"
+                                    style="font-size: 0.8rem;">Protegido</span>
+                            </span>
+                        </div>
+                        <div class="summary-item" style="border: none;">
+                            <span class="summary-label">Puntuación OSINT</span>
+                            <span class="summary-value" id="osint-score-value">{{ osint.score if osint else 100
+                                }}%</span>
+                        </div>
+                    </div>
+
+                    <!-- V3 Advanced Modules Grid (2x2) -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6 col-lg-4">
+                            <div onclick="showSecurityModule('audit')" class="module-card audit cursor-pointer">
+                                <div class="module-icon">
+                                    <i class="fas fa-microchip"></i>
+                                </div>
+                                <h5 class="module-title">Complejidad</h5>
+                                <p class="module-desc">Análisis de entropía y patrones técnicos.</p>
+                                <div class="module-stats">
+                                    <div class="progress-micro">
+                                        <div class="progress-micro-bar bg-info"
+                                            style="width: {{ (audit.secure * 100 / audit.total) if (audit and audit.total and audit.total > 0) else 0 }}%">
+                                        </div>
+                                    </div>
+                                    <span class="badge-module text-info">{{ audit.secure if audit else 0 }} seguras / {{
+                                        audit.total if audit else 0 }}
+                                        total</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div onclick="showSecurityModule('osint')" class="module-card osint cursor-pointer">
+                                <div class="module-icon">
+                                    <i class="fas fa-fingerprint"></i>
+                                </div>
+                                <h5 class="module-title">OSINT & Patrones</h5>
+                                <p class="module-desc">Busca información personal filtrada en tus claves.</p>
+                                <div class="module-stats">
+                                    <div class="progress-micro">
+                                        <div class="progress-micro-bar bg-primary"
+                                            style="width: {{ osint.score if osint else 100 }}%"></div>
+                                    </div>
+                                    <span class="badge-module text-primary">Nivel de privacidad: {{ osint.score if osint
+                                        else 100 }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div onclick="showSecurityModule('breach')" class="module-card breach cursor-pointer">
+                                <div class="module-icon">
+                                    <i class="fas fa-shield-virus"></i>
+                                </div>
+                                <h5 class="module-title">Brechas HIBP</h5>
+                                <p class="module-desc">Filtraciones en bases de datos públicas.</p>
+                                <div class="module-stats">
+                                    <div class="progress-micro">
+                                        <div class="progress-micro-bar bg-danger" style="width: 0%"></div>
+                                    </div>
+                                    <span class="badge-module text-danger">Análisis preventivo</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div onclick="showSecurityModule('cracking')" class="module-card cracking cursor-pointer">
+                                <div class="module-icon">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <h5 class="module-title">Fuerza Bruta</h5>
+                                <p class="module-desc">Tiempos de descifrado (Hardware real).</p>
+                                <div class="module-stats">
+                                    <div class="progress-micro">
+                                        <div class="progress-micro-bar bg-warning" style="width: 45%"></div>
+                                    </div>
+                                    <span class="badge-module text-warning">Riesgo calculado</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div onclick="showSecurityModule('reuse')" class="module-card reused cursor-pointer">
+                                <div class="module-icon">
+                                    <i class="fas fa-copy"></i>
+                                </div>
+                                <h5 class="module-title">Reutilizadas</h5>
+                                <p class="module-desc">Detecta claves duplicadas entre servicios.</p>
+                                <div class="module-stats">
+                                    <div class="progress-micro">
+                                        <div class="progress-micro-bar bg-success"
+                                            style="width: {{ (audit.reused_count * 100 / audit.total) if (audit and audit.total and audit.total > 0) else 0 }}%">
+                                        </div>
+                                    </div>
+                                    <span class="badge-module text-success">{{ audit.reused_count if audit else 0 }}
+                                        grupos
+                                        detectados</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SPA Security Modules Container -->
+                <div id="security-module-container" style="display: none;">
+                    <!-- Content will be injected via JS -->
+                </div>
+
+                <!-- Empty state -->
+                <div id="empty-state" class="text-center py-5"
+                    style="background: var(--glass-bg); border-radius: 16px; border: 1px dashed var(--glass-border); display: none;">
+                    <i class="fas fa-arrow-left fa-2xl mb-3 text-dim opacity-25"></i>
+                    <p class="h5 text-dim">Selecciona una cuenta en el panel lateral para ver detalles</p>
+                </div>
+
+                <!-- ACCOUNT DETAIL (dinamico) -->
+                <div id="account-detail-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <!-- MODALS (Moved to end for better interaction) -->
+
+    <!-- Modal Nueva Cuenta -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #0f172a; color: white;">
+                    <h5 class="modal-title">Nueva Cuenta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="accountName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notas (opcional)</label>
+                        <textarea class="form-control" id="accountNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAccount()">Guardar Cuenta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Servicio -->
+    <div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #0f172a; color: white;">
+                    <h5 class="modal-title">Nuevo Servicio</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Servicio</label>
+                        <input type="text" class="form-control" id="serviceName">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveService()">Crear Servicio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nueva Credencial -->
+    <div class="modal fade" id="credentialModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #0f172a; color: white;">
+                    <h5 class="modal-title">Nueva Credencial</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Usuario/Email</label>
+                        <input type="text" class="form-control" id="credentialUsername">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="credentialPassword"
+                                oninput="validatePasswordStrength()">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="showGeneratePasswordModal()">🔄 Generar</button>
+                        </div>
+                        <div id="strengthDisplay" style="margin-top: 10px;"></div>
+                        <div id="hibpDisplay" class="hibp-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span>¡Atención! Esta contraseña ha sido filtrada en brechas de datos. No es segura.</span>
+                        </div>
+                        <div id="hibpSafe" class="hibp-safe">
+                            <i class="fas fa-check-circle me-1"></i> Contraseña no detectada en filtraciones conocidas.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCredential()">Guardar Credencial</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Generador de Contraseña -->
+    <div class="modal fade" id="generatePwdModal" tabindex="-1" aria-hidden="true" style="z-index: 1070;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #0f172a; color: white;">
+                    <h5 class="modal-title">Generar Contraseña</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Longitud</label>
+                        <select class="form-select" id="pwdLength">
+                            <option value="8">8 caracteres</option>
+                            <option value="16" selected>16 caracteres</option>
+                            <option value="24">24 caracteres</option>
+                            <option value="32">32 caracteres</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Incluir</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="pwdUppercase" checked>
+                            <label class="form-check-label">Mayúsculas (A-Z)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="pwdLowercase" checked>
+                            <label class="form-check-label">Minúsculas (a-z)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="pwdDigits" checked>
+                            <label class="form-check-label">Números (0-9)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="pwdSymbols" checked>
+                            <label class="form-check-label">Símbolos (!@#$%^&*)</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña Generada</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="generatedPassword" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="generatePassword()">🔄
+                                Regenerar</button>
+                        </div>
+                        <div id="genStrengthDisplay" style="margin-top: 10px;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="useGeneratedPassword()">Usar
+                        Contraseña</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ver Contraseña -->
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-white-5"
+                style="background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px);">
+                <div class="modal-header border-white-5">
+                    <h5 class="modal-title font-monospace"><i class="fas fa-key me-2 text-primary"></i>DETALLES DE
+                        CREDENCIAL</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="text-dim small text-uppercase mb-1 d-block"
+                            style="letter-spacing: 1px;">Servicio</label>
+                        <h4 id="viewService" class="text-white mb-0 fw-bold"></h4>
+                    </div>
+                    <div class="mb-4">
+                        <label class="text-dim small text-uppercase mb-1 d-block" style="letter-spacing: 1px;">Usuario /
+                            Email</label>
+                        <p id="viewUsername" class="h5 mb-0 text-white opacity-75"></p>
+                    </div>
+                    <div class="mb-2">
+                        <label class="text-dim small text-uppercase mb-1 d-block"
+                            style="letter-spacing: 1px;">Contraseña Descifrada</label>
+                        <div class="p-3 rounded-4 d-flex justify-content-between align-items-center mb-0"
+                            style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);">
+                            <code id="viewPassword" class="h5 text-danger mb-0 font-monospace"
+                                style="letter-spacing: 1px;"></code>
+                            <button class="btn btn-primary btn-sm rounded-3" id="btn-copy-view"
+                                onclick="copyViewPassword()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div id="viewHibpStatus" class="mt-3"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-white-5">
+                    <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-4"
+                        data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Perfil de Usuario (OSINT) -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-id-card me-2"></i>Mi Perfil Personal</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-dim small mb-4">Esta información se usa localmente para detectar si usas datos
+                        personales en tus contraseñas. Nunca sale de tu bóveda cifrada.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" id="profileFullName" placeholder="Ej: Juan Pérez">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mascotas (separadas por comas)</label>
+                        <input type="text" class="form-control" id="profilePets" placeholder="Ej: Toby, Rex">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ciudades/Lugares (separados por comas)</label>
+                        <input type="text" class="form-control" id="profileLocations" placeholder="Ej: Madrid, Málaga">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Otras palabras clave (separadas por comas)</label>
+                        <input type="text" class="form-control" id="profileKeywords" placeholder="Ej: 1990, Futbol">
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="profilePhone" placeholder="Ej: +34 600 000 000">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ocupación</label>
+                            <input type="text" class="form-control" id="profileJob" placeholder="Ej: Ingeniero">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Color Favorito</label>
+                        <input type="text" class="form-control" id="profileColor" placeholder="Ej: Azul">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Aficiones (separadas por comas)</label>
+                        <input type="text" class="form-control" id="profileHobbies" placeholder="Ej: Gaming, Surf">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveUserProfile()">Guardar Perfil</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Dialogs (Glassmorphism) -->
+    <div class="modal fade" id="customDialogModal" tabindex="-1" aria-hidden="true" style="z-index: 2000;">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content text-center py-4 px-3"
+                style="border-radius: 28px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);">
+                <div id="dialogIcon" class="mb-3" style="font-size: 3rem;"></div>
+                <h5 id="dialogTitle" class="mb-2"></h5>
+                <p id="dialogMessage" class="text-dim small mb-4"></p>
+                <div class="d-flex gap-2 justify-content-center" id="dialogButtons">
+                    <!-- Buttons injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=3.1.5"></script>
+</body>
+
+</html>

@@ -1,0 +1,67 @@
+{% extends "security_base.html" %}
+
+{% block title %}Reutilización de Contraseñas{% endblock %}
+{% block header_title %}Reutilización / Mapa de Riesgo{% endblock %}
+{% block header_desc %}Detección de identidades duplicadas y vulnerabilidades por relleno de credenciales.{% endblock %}
+
+{% block analysis_content %}
+El **Credential Stuffing** es uno de los ataques más efectivos hoy en día. Si usas la misma contraseña en tu correo y en
+una tienda online, un atacante que robe los datos de la tienda podrá acceder a tu correo automáticamente. Nuestro
+sistema escanea tu bóveda cifrada para encontrar coincidencias exactas de contraseñas entre diferentes servicios.
+{% endblock %}
+
+{% block tech_specs %}
+• **Detección**: Comparación de Hashes locales.<br>
+• **Gravedad**: Factor multiplicador de riesgo.<br>
+• **Privacidad**: Zero-Knowledge (comparación offline).
+{% endblock %}
+
+{% block status_visual %}
+<div class="h2 fw-bold mb-0 {% if audit.reused > 0 %}text-danger{% else %}text-success{% endif %}">
+    {{ audit.reused }}
+</div>
+<div class="text-dim small mb-3">Grupos de Duplicados</div>
+<div class="risk-bar-container">
+    <div class="risk-bar {% if audit.reused > 0 %}risk-red{% else %}risk-green{% endif %}"
+        style="width: {{ 100 if audit.reused > 0 else 0 }}%"></div>
+</div>
+<span class="badge-status {% if audit.reused > 0 %}bg-danger{% else %}bg-success{% endif %}">
+    {% if audit.reused > 0 %}CRÍTICO{% else %}OPTIMIZADO{% endif %}
+</span>
+{% endblock %}
+
+{% block results_content %}
+{% if audit.reused > 0 %}
+<div class="alert alert-warning border-0 rounded-4 mb-4"
+    style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+    <i class="fas fa-exclamation-circle me-2"></i> **Peligro detectado**: Tienes servicios compartiendo la misma llave
+    de acceso. Una sola filtración compromete múltiples cuentas.
+</div>
+
+<h6 class="text-white fw-bold mb-3">Servicios con Contraseñas Repetidas:</h6>
+<div class="list-group list-group-flush bg-transparent">
+    <div class="list-group-item bg-transparent border-white-5 px-0">
+        <p class="text-dim small mb-0">Para resolver esto, utiliza el **Generador de Contraseñas** en el dashboard para
+            asignar una clave única a cada uno de estos servicios.</p>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <div class="mb-3">
+        <span class="fa-stack fa-2x">
+            <i class="fas fa-circle fa-stack-2x text-success" style="opacity: 0.1;"></i>
+            <i class="fas fa-fingerprint fa-stack-1x text-success"></i>
+        </span>
+    </div>
+    <h5 class="text-white">¡Bóveda Única!</h5>
+    <p class="text-dim">Todas tus cuentas utilizan contraseñas independientes. Estás protegido contra ataques de relleno
+        de credenciales.</p>
+</div>
+{% endif %}
+
+<div class="mt-4 tech-spec">
+    <strong>💡 Recomendación del Arquitecto:</strong><br>
+    Prioriza el cambio de contraseñas en cuentas financieras y de correo electrónico. Son los objetivos principales
+    cuando se detectan patrones de reutilización.
+</div>
+{% endblock %}
