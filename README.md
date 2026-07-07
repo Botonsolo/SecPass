@@ -36,8 +36,6 @@ El proyecto nace con el objetivo de proporcionar un entorno seguro para la gesti
 * Gestión controlada de secretos.
 * Diseño orientado a reducir la superficie de ataque.
 
-  <img width="1621" height="437" alt="image" src="https://github.com/user-attachments/assets/e08196d8-3d8a-420c-bcdf-6466c334d26f" />
-
 
 ### Usabilidad
 
