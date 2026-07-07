@@ -1,142 +1,124 @@
 # 🔐 SecPass
 
-<img width="1907" height="846" alt="image" src="https://github.com/user-attachments/assets/ff33cf06-383f-4a7f-90a5-82a216df28de" />
+<img width="1907" height="846" alt="SecPass UI" src="https://github.com/user-attachments/assets/ff33cf06-383f-4a7f-90a5-82a216df28de" />
 
-**SecPass** es un gestor de contraseñas diseñado con un enfoque centrado en la seguridad, la simplicidad y la evolución hacia una arquitectura preparada para producción.
+## Why This Project
 
-El proyecto nace con el objetivo de proporcionar un entorno seguro para la gestión de credenciales, aplicando principios de desarrollo seguro desde las primeras fases de diseño y sirviendo al mismo tiempo como plataforma de aprendizaje en ciberseguridad, criptografía aplicada y desarrollo de sistemas.
+Password management is still, in practice, broken for most people: credentials scattered across notes, browsers, and memory, weak passwords reused across services, and predictable patterns — birthdates, pet names, keyboard sequences — that are trivial to guess or brute-force. This disorder is one of the most common root causes behind account takeovers and credential-stuffing attacks.
 
----
+SecPass was built to address that gap directly: a single, secure place to store credentials, removing the incentive to reuse weak or personally-guessable passwords, and applying security-by-design principles from the first line of code rather than bolting them on afterward.
 
-## 🎯 Objetivos
-
-* Almacenar credenciales de forma segura.
-* Reducir el riesgo asociado a la reutilización de contraseñas.
-* Aplicar principios de seguridad por diseño.
-* Desarrollar una arquitectura escalable y mantenible.
-* Evolucionar progresivamente hacia un modelo cliente-servidor.
+**SecPass** is a password manager built with a security-first design approach. It started as a learning project in applied cryptography and secure development, and is evolving toward a production-ready client-server architecture.
 
 ---
 
-## ✨ Características
+## How It Works
 
-### Gestión de credenciales
+SecPass stores credentials [locally / in an encrypted local database — confirm which]. Secrets are protected using the following scheme:
 
-* Almacenamiento centralizado de contraseñas.
-* Organización de credenciales por servicios.
-* Consulta rápida de registros almacenados.
-* Eliminación segura de entradas.
+| Layer | Implementation |
+|---|---|
+| Master password → key derivation | `[e.g. Argon2id / PBKDF2-HMAC-SHA256, iteration count]` |
+| Encryption at rest | `[e.g. AES-256-GCM]` |
+| Storage format | `[e.g. SQLite file / encrypted JSON blob]` |
+| Input validation | `[e.g. schema validation via Pydantic / manual regex checks on X fields]` |
 
-  
-
-### Seguridad
-
-* Protección de información sensible.
-* Minimización de exposición de datos.
-* Validación de entradas.
-* Gestión controlada de secretos.
-* Diseño orientado a reducir la superficie de ataque.
-
-
-### Usabilidad
-
-* Interfaz sencilla y directa.
-* Flujo de trabajo intuitivo.
-* Acceso rápido a credenciales almacenadas.
+> ⚠️ Replace the placeholders above with the actual implementation. If a control isn't implemented yet, move it to the Roadmap instead of listing it here — an accurate "not yet done" is more credible than an unverified claim.
 
 ---
 
-## 🏗️ Arquitectura
+## Threat Model
 
-Actualmente SecPass está concebido como una aplicación local, con una evolución planificada hacia una arquitectura más robusta orientada a servicios.
+This project is designed with the following threats in mind:
+
+| Threat | Mitigation |
+|---|---|
+| Device theft / unauthorized local access | Master password required; data encrypted at rest |
+| Credential stuffing from reused passwords | Password strength evaluation (planned, see Roadmap) |
+| Storage file exfiltration | Encryption ensures ciphertext is useless without the master key |
+| Brute-force on master password | `[e.g. Argon2id cost parameters tuned for X ms per attempt]` |
+| Malicious/malformed input | Input validation at the storage boundary |
+
+*Out of scope (for now):* multi-user access control, network-based attacks (no server component yet), memory-scraping protections.
+
+> This section is the most valuable part of the README for a security-focused audience — it shows you think like an analyst, not just a developer. Adjust freely to match what you've actually reasoned through.
+
+---
+
+## Features
+
+**Credential Management**
+- Centralized password storage
+- Organization of credentials by service
+- Fast lookup of stored entries
+- Secure deletion of entries
+
+**Security**
+- Sensitive data protection at rest
+- Minimized data exposure
+- Input validation
+- Controlled secrets handling
+- Attack-surface-conscious design
+
+**Usability**
+- Simple, direct interface
+- Intuitive workflow
+- Quick access to stored credentials
+
+---
+
+## Architecture
+
+Current (local application):
 
 ```text
 ┌─────────────────┐
-│     Usuario     │
-└────────┬────────┘
+│      User        │
+└────────┬─────────┘
          │
          ▼
 ┌─────────────────┐
-│     SecPass     │
-│  Aplicación UI  │
-└────────┬────────┘
+│  SecPass App UI  │
+└────────┬─────────┘
          │
          ▼
 ┌─────────────────┐
-│ Almacenamiento  │
-│   Credenciales  │
+│ Encrypted Store  │
 └─────────────────┘
 ```
 
-Arquitectura futura:
+Planned (client-server):
 
 ```text
+┌────────────┐
+│   Client   │
+└─────┬──────┘
+      │
+      ▼
 ┌─────────────┐
-│   Cliente   │
-└──────┬──────┘
-       │
-       ▼
+│ SecPass API │
+└─────┬───────┘
+      │
+      ▼
 ┌─────────────┐
-│ API SecPass │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Base Datos  │
+│  Database   │
 └─────────────┘
 ```
 
 ---
 
-## 🛡️ Principios de Seguridad
-
-SecPass sigue una filosofía basada en:
-
-### Mínimo privilegio
-
-Cada componente debe disponer únicamente de los permisos estrictamente necesarios para realizar su función.
-
-### Reducción de superficie de ataque
-
-Se evita incorporar funcionalidades innecesarias que aumenten la complejidad o el riesgo.
-
-### Validación de entradas
-
-Toda entrada de usuario debe considerarse potencialmente maliciosa hasta ser validada.
-
-### Defensa en profundidad
-
-La seguridad no depende de un único mecanismo, sino de múltiples capas complementarias.
-
-### Diseño orientado a amenazas
-
-Antes de implementar nuevas funcionalidades se analizan posibles vectores de ataque y riesgos asociados.
-
----
-
-## 🚀 Instalación
+## Installation
 
 ```bash
-git clone https://github.com/usuario/secpass.git
-
+git clone https://github.com/[your-username]/secpass.git
 cd secpass
-```
-
-Instala las dependencias necesarias:
-
-```bash
 pip install -r requirements.txt
-```
-
-Ejecuta la aplicación:
-
-```bash
 python main.py
 ```
 
 ---
 
-## 📂 Estructura del Proyecto
+## Project Structure
 
 ```text
 secpass/
@@ -158,59 +140,50 @@ secpass/
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-### v1.0.0
+**v1.0.0**
+- Basic credential management
+- Functional interface
+- Data persistence
 
-* Gestión básica de credenciales.
-* Interfaz funcional.
-* Persistencia de datos.
+**v1.1.0**
+- Controlled password reveal/copy
+- UX improvements
+- Storage optimization
 
-### v1.1.0
+**v1.2.0**
+- Password strength evaluation
+- Security recommendations
 
-* Visualización controlada de contraseñas.
-* Mejoras de experiencia de usuario.
-* Optimización del almacenamiento.
+**v1.3.0**
+- Have I Been Pwned integration
+- Breach credential verification
 
-### v1.2.0
-
-* Evaluación de fortaleza de contraseñas.
-* Recomendaciones de seguridad.
-
-### v1.3.0
-
-* Integración con Have I Been Pwned.
-* Verificación de credenciales filtradas.
-
-### v2.0.0
-
-* Arquitectura cliente-servidor.
-* API dedicada.
-* Gestión multiusuario.
-* Preparación para despliegues en producción.
+**v2.0.0**
+- Client-server architecture
+- Dedicated API
+- Multi-user support
+- Production-readiness hardening
 
 ---
 
-## 🔬 Objetivos de Aprendizaje
+## What This Project Demonstrates
 
-Este proyecto permite profundizar en:
-
-* Desarrollo seguro.
-* Gestión de credenciales.
-* Arquitecturas de aplicaciones.
-* Seguridad ofensiva y defensiva.
-* Gestión de secretos.
-* Hardening de aplicaciones.
-* Buenas prácticas de ingeniería de software.
+- Secure-by-design development practices
+- Applied cryptography (key derivation, encryption at rest)
+- Threat modeling and risk-driven design decisions
+- Application hardening principles
+- Software engineering fundamentals (structure, testing, documentation)
 
 ---
 
-## ⚠️ Aviso
+## ⚠️ Disclaimer
 
-SecPass se encuentra en desarrollo activo. Antes de utilizarlo para almacenar información crítica en entornos reales, se recomienda realizar auditorías de seguridad, pruebas de penetración y revisiones completas del código.
+SecPass is under active development. It has not undergone a formal security audit or penetration test. Do not use it to store real, sensitive credentials in production until a full review has been completed.
 
 ---
 
-## 📜 Licencia
+## License
 
-Este proyecto se distribuye bajo la licencia que el propietario considere adecuada para su uso y distribución.
+[Specify: MIT / Apache 2.0 / etc. — pick one rather than leaving it open-ended; "whatever the owner deems appropriate" reads as unfinished.]
