@@ -1,5 +1,7 @@
 # 🔐 SecPass
 
+<img width="1907" height="846" alt="image" src="https://github.com/user-attachments/assets/ff33cf06-383f-4a7f-90a5-82a216df28de" />
+
 **SecPass** es un gestor de contraseñas diseñado con un enfoque centrado en la seguridad, la simplicidad y la evolución hacia una arquitectura preparada para producción.
 
 El proyecto nace con el objetivo de proporcionar un entorno seguro para la gestión de credenciales, aplicando principios de desarrollo seguro desde las primeras fases de diseño y sirviendo al mismo tiempo como plataforma de aprendizaje en ciberseguridad, criptografía aplicada y desarrollo de sistemas.
@@ -25,8 +27,7 @@ El proyecto nace con el objetivo de proporcionar un entorno seguro para la gesti
 * Consulta rápida de registros almacenados.
 * Eliminación segura de entradas.
 
-  <img width="1907" height="846" alt="image" src="https://github.com/user-attachments/assets/ff33cf06-383f-4a7f-90a5-82a216df28de" />
-
+  
 
 ### Seguridad
 
