@@ -182,7 +182,7 @@ Contributing & Bug Reports
 
 Found a bug, unexpected behavior, or have an idea for improvement? Issues and pull requests are welcome — open one on this repo with as much detail as possible (steps to reproduce, expected vs actual behavior, environment).
 
-Found a security vulnerability? Please don't open a public issue for it. Instead, reach out directly at [your contact email] so it can be addressed responsibly before details are public. Responsible disclosure is taken seriously here.
+Found a security vulnerability? Please don't open a public issue for it. Instead, reach out directly at [jorgecortesid@gmail.com] so it can be addressed responsibly before details are public. Responsible disclosure is taken seriously here.
 
 ---
 
