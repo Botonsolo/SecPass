@@ -25,6 +25,9 @@ El proyecto nace con el objetivo de proporcionar un entorno seguro para la gesti
 * Consulta rápida de registros almacenados.
 * Eliminación segura de entradas.
 
+  <img width="1907" height="846" alt="image" src="https://github.com/user-attachments/assets/ff33cf06-383f-4a7f-90a5-82a216df28de" />
+
+
 ### Seguridad
 
 * Protección de información sensible.
@@ -32,6 +35,9 @@ El proyecto nace con el objetivo de proporcionar un entorno seguro para la gesti
 * Validación de entradas.
 * Gestión controlada de secretos.
 * Diseño orientado a reducir la superficie de ataque.
+
+  <img width="1621" height="437" alt="image" src="https://github.com/user-attachments/assets/e08196d8-3d8a-420c-bcdf-6466c334d26f" />
+
 
 ### Usabilidad
 
