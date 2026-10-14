@@ -23,7 +23,6 @@ SecPass stores credentials [locally / in an encrypted local database — confirm
 | Storage format | `[e.g. SQLite file / encrypted JSON blob]` |
 | Input validation | `[e.g. schema validation via Pydantic / manual regex checks on X fields]` |
 
-> ⚠️ Replace the placeholders above with the actual implementation. If a control isn't implemented yet, move it to the Roadmap instead of listing it here — an accurate "not yet done" is more credible than an unverified claim.
 
 ---
 
@@ -40,8 +39,6 @@ This project is designed with the following threats in mind:
 | Malicious/malformed input | Input validation at the storage boundary |
 
 *Out of scope (for now):* multi-user access control, network-based attacks (no server component yet), memory-scraping protections.
-
-> This section is the most valuable part of the README for a security-focused audience — it shows you think like an analyst, not just a developer. Adjust freely to match what you've actually reasoned through.
 
 ---
 
